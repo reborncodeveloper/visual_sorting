@@ -45,10 +45,3 @@ async def generate_level(level_data : Level_Data) -> Generated_level:
     return Generated_level(name=name, items=items, wright_time_sec=wright_time_sec)
 
         
-if __name__ == '__main__':
-    async def main():
-        data = await get_level_data(1)
-        return await generate_level(data)
-    import asyncio
-    print(asyncio.run(main()))
-    
