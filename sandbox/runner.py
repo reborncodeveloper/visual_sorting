@@ -54,7 +54,8 @@ async def get_key_function(code : str, key_function_name : str = 'sort'):
 
     
 def check_users_code(key_function) -> None:
-    return inspect.getsource(key_function)
+    user_function = inspect.getsource(key_function)
+    
 
 
 if __name__ == "__main__":

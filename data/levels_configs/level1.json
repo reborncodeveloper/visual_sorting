@@ -1,6 +1,6 @@
 {
     "name" : "level_1",
     "items_in_list" : 5,
-    "wright_time_sec" : 60.0,
+    "write_time_sec" : 60.0,
     "column_range" : 10
 }
