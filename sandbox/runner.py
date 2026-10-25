@@ -1,5 +1,7 @@
 from typing import TypedDict, Dict
 import ast
+import linecache
+import inspect
 
 class Users_code(TypedDict):
     level_number : int
@@ -16,6 +18,8 @@ async def get_key_function(code : str, key_function_name : str = 'sort'):
     if not key_function_name in functions:
         raise FunctionNameError
     
+    
+    #maintain namespace to avoid functions and imports in code
     namespace = {
         '__builtins__':
             {
@@ -33,23 +37,31 @@ async def get_key_function(code : str, key_function_name : str = 'sort'):
             }
     }
     
+    #caching lines specially for inspect
+    linecache.cache['<user>'] = (
+        len(code),
+        None,
+        [line + "\n" for line in code.splitlines()],
+        '<user>',
+    )
+    
+    #compile
     exec(compile(parsing_code, '<user>', 'exec'), namespace)
     key_function = namespace[key_function_name]
 
-    return namespace
+    return key_function
 
 
-async def check_users_code(key_function : str) -> None:
-    ...
     
-    
-if __name__ == '__main__':
+def check_users_code(key_function) -> None:
+    return inspect.getsource(key_function)
+
+
+if __name__ == "__main__":
+    code = '\ndef sort():\n    "hello"\n'
     import asyncio
-    code = '''
-def sort():
-    print("hello")
-'''
     async def main(code):
-        return await get_key_function(code)
-    
+        key_function = await get_key_function(code)
+        return await asyncio.to_thread(check_users_code, key_function)
+
     print(asyncio.run(main(code)))
