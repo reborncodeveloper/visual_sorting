@@ -1,7 +1,8 @@
 from typing import TypedDict, Dict
-import ast
-import linecache
-import inspect
+from ast import parse, FunctionDef, FunctionType
+from linecache import cache
+from inspect import getsource
+from _user_code_caching import create_user_cache
 
 class Users_code(TypedDict):
     level_number : int
@@ -13,8 +14,8 @@ class FunctionNameError(Exception):
     pass
     
 async def get_key_function(code : str, key_function_name : str = 'sort'):
-    parsing_code = ast.parse(code)
-    functions = [i.name for i in parsing_code.body if isinstance(i, (ast.FunctionDef, ast.FunctionType))]
+    parsing_code = parse(code)
+    functions = [i.name for i in parsing_code.body if isinstance(i, (FunctionDef, FunctionType))]
     if not key_function_name in functions:
         raise FunctionNameError
     
@@ -38,7 +39,7 @@ async def get_key_function(code : str, key_function_name : str = 'sort'):
     }
     
     #caching lines specially for inspect
-    linecache.cache['<user>'] = (
+    cache['<user>'] = (
         len(code),
         None,
         [line + "\n" for line in code.splitlines()],
@@ -53,8 +54,9 @@ async def get_key_function(code : str, key_function_name : str = 'sort'):
 
 
     
-def check_users_code(key_function) -> None:
-    user_function = inspect.getsource(key_function)
+async def check_users_code(key_function) -> None:
+    user_function_code = getsource(key_function)
+    return await create_user_cache(user_function_code)
     
 
 
@@ -63,6 +65,6 @@ if __name__ == "__main__":
     import asyncio
     async def main(code):
         key_function = await get_key_function(code)
-        return await asyncio.to_thread(check_users_code, key_function)
+        return await check_users_code(key_function)
 
     print(asyncio.run(main(code)))
