@@ -2,7 +2,10 @@ from typing import TypedDict, Dict
 from ast import parse, FunctionDef, FunctionType
 from linecache import cache
 from inspect import getsource
-from _user_code_caching import create_user_cache
+from sandbox._user_code_caching import create_user_cache
+from pathlib import Path
+from subprocess import run
+from app.services.levels import generate_level, get_level_data
 
 class Users_code(TypedDict):
     level_number : int
@@ -54,17 +57,30 @@ async def get_key_function(code : str, key_function_name : str = 'sort'):
 
 
     
-async def check_users_code(key_function) -> None:
+async def get_users_code_path(key_function, level) -> Path:
     user_function_code = getsource(key_function)
-    return await create_user_cache(user_function_code)
+    return await create_user_cache(user_function_code, level)
     
+# async def run_users_code(user_code_path : Path):
+#     run('''docker run --rm \
+#   --network none \
+#   --memory 64m \
+#   --cpus 0.5 \
+#   --pids-limit 64 \
+#   --read-only \
+#   --tmpfs /tmp:rw,noexec,nosuid,size=16m \
+#   --user 10001:10001 \
+#   --cap-drop ALL \
+#   --security-opt no-new-privileges \
+#   -v "$PWD/users_cache/runtime_inputs/2ee1a74a-be4e-4a5b-8281-2a6619257f89:/input:ro" \
+#   visual-sorting-sandbox''', shell=True)
 
 
-if __name__ == "__main__":
+
+
+async def main():
     code = '\ndef sort():\n    "hello"\n'
-    import asyncio
-    async def main(code):
-        key_function = await get_key_function(code)
-        return await check_users_code(key_function)
-
-    print(asyncio.run(main(code)))
+    level_data = await get_level_data(1)
+    level = await generate_level(level_data)
+    key_function = await get_key_function(code)
+    return await get_users_code_path(key_function, level)
