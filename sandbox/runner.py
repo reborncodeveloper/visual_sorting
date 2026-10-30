@@ -5,8 +5,6 @@ from inspect import getsource
 from sandbox._user_code_caching import create_user_cache
 from pathlib import Path
 from subprocess import run
-from app.services.levels import generate_level, get_level_data
-
 class Users_code(TypedDict):
     level_number : int
     level_data : Dict[int, int]
@@ -76,11 +74,3 @@ async def get_users_code_path(key_function, level) -> Path:
 #   visual-sorting-sandbox''', shell=True)
 
 
-
-
-async def main():
-    code = '\ndef sort():\n    "hello"\n'
-    level_data = await get_level_data(1)
-    level = await generate_level(level_data)
-    key_function = await get_key_function(code)
-    return await get_users_code_path(key_function, level)
