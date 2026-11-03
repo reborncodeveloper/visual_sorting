@@ -3,27 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="{{ url('static', filename='css/index.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
     <title>Visual_sorting</title>
 </head>
 <body>
     <div class="header">
         <h1 id="label">
-            Visual Sorting 
+            Visual Sorting {{user}} 
         </h1>
+        <div class="line"></div>
     </div>
     <div class="main_part">
         <div class="frame">
             <div class="visual_area">
-
+                {% for column in columns %}
+                    {{ column | safe }}
+                {% endfor %}
             </div>
+            <div class="line_between_code"></div>
             <div class="code_area">
-                
+                <textarea id="code_area" ></textarea>
             </div>
         </div>
     </div>
+    <script src="../static/js/index.js"></script>
 </body>
 </html>
+
+
