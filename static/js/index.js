@@ -1,5 +1,21 @@
 const textarea = document.querySelector("#code_area");
+const runBtn = document.querySelector("#run_btn");
+const restore_level = document.querySelector("#restore_level");
+const next_level = document.querySelector("#next_level");
+const visual_area = document.querySelector(".visual_area");
+const code_area = document.querySelector('#code_area')
+const original_level_html = visual_area.innerHTML;
+const reset_code = document.querySelector("#reset_code");
 
+
+
+
+document.addEventListener("DOMContentLoaded", (event) => {
+  const user_code = localStorage.getItem('user_code');
+  console.log(user_code)
+  code_area.value = user_code ? user_code : 'def sort(list):\n    return list' 
+
+});
 
 textarea.addEventListener("keydown", (e) => {
   const start = textarea.selectionStart;
@@ -15,4 +31,70 @@ textarea.addEventListener("keydown", (e) => {
     textarea.setRangeText(`(${selected})`, start, end, "end");
     if (!selected) textarea.selectionStart = textarea.selectionEnd = start + 1;
   }
+});
+
+
+const level = JSON.parse(
+  document.getElementById("level-data").textContent
+);
+
+function heightFor(value) {
+  return Math.trunc(-246.36 + 219.03 * (Math.log(value + 3) / Math.log(3)));
+}
+
+async function show_result(result, expected_result) {
+  visual_area.innerHTML = "";
+
+  let failed = false;
+  for (let i = 0; i < expected_result.length; i++) {
+    await new Promise((r) => setTimeout(r, 150));
+
+    const value = result[i];
+    let ok;
+    if (failed) {
+      ok = false;
+    } else if (value === expected_result[i]) {
+      ok = true;
+    } else {
+      ok = false;
+      failed = true;
+    }
+
+    const col = document.createElement("div");
+    col.className = "test_column";
+    col.style.height = heightFor(value ?? 0) + "px";
+    col.style.background = ok
+      ? "rgba(203, 255, 59, 0.73)"
+      : "rgba(255, 98, 59, 0.73)";
+    col.innerHTML = "<p>" + (value ?? "None") + "</p>";
+    visual_area.appendChild(col);
+  }
+}
+
+restore_level.addEventListener("click", () => {
+  visual_area.innerHTML = original_level_html;
+});
+
+next_level.addEventListener("click", () => {
+  localStorage.setItem('user_code', code_area.value)
+  window.location.reload();
+});
+
+reset_code.addEventListener("click", () => {
+  localStorage.removeItem('user_code');
+  code_area.value = 'def sort(list):\n    return list'
+});
+
+runBtn.addEventListener("click", async () => {
+  const res = await fetch("/api/run", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      code: textarea.value,
+      level: level,
+    }),
+  });
+  const data = await res.json();
+  console.log(data);
+  await show_result(data.result, data.expected_result);
 });

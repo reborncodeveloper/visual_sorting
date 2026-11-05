@@ -2,9 +2,13 @@ from typing import TypedDict, Dict
 from ast import parse, FunctionDef, FunctionType
 from linecache import cache
 from inspect import getsource
-from app.services._user_code_caching import create_user_cache
+from services._user_code_caching import create_user_cache
 from pathlib import Path
 import asyncio
+import logging
+import shutil
+
+logging.basicConfig(level=logging.INFO)
 
 class Users_code(TypedDict):
     level_number : int
@@ -53,13 +57,14 @@ async def get_key_function(code : str, key_function_name : str = 'sort'):
 
 
     
-async def get_users_code_path(key_function, level) -> Path:
-    user_function_code = getsource(key_function)
-    return await create_user_cache(user_function_code, level)
+async def get_users_code_path(users_code: str, level) -> Path:
+    return await create_user_cache(users_code, level)
 
 
 async def run_users_code(users_code_dir: Path) -> str:
     abs_dir = str(users_code_dir.parent.resolve()) 
+    logging.info("mount dir: %s", abs_dir)
+    logging.info("payload exists: %s", Path(abs_dir, "payload.json").exists())
 
     proc = await asyncio.create_subprocess_exec(
         "docker", "run", "--rm",
@@ -81,4 +86,6 @@ async def run_users_code(users_code_dir: Path) -> str:
     stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=3)
     if proc.returncode != 0:
         raise RuntimeError(stderr.decode()[:500])
+    
+    shutil.rmtree(abs_dir) 
     return stdout.decode()

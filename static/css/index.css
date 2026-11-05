@@ -27,6 +27,8 @@ body{
 }
 
 .main_part{
+    display: flex;
+    flex-direction: column;
     align-self: center;
     text-align: center;
     align-items: center;
@@ -41,6 +43,7 @@ body{
     height: 90%;
     border: 1px solid rgb(255, 133, 27);
     border-radius: 15px;
+    align-items: center;
 }
 
 .visual_area{
@@ -91,5 +94,45 @@ textarea::-webkit-scrollbar {
     flex-direction: column;
     width: 40px;
 
+}
+
+.code_area_bottom_menu{
+    display: flex;
+    margin-top: 25px;
+    width: 75%;
+    height: 70px;
+    border: 1px solid rgba(255, 133, 27, 0.726);
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    gap: 15px;
+}
+
+#run_btn{
+    height: 50px;
+    width: 90px;
+    background: rgba(255, 133, 27, 0.726);
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    outline: none;
+    border-radius: 15px;
+}
+
+.bottom_menu_btn{
+    height: 50px;
+    width: 90px;
+    background: rgba(255, 133, 27, 0.726);
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    outline: none;
+    border-radius: 15px;
 }
 
