@@ -1,13 +1,13 @@
 const textarea = document.querySelector("#code_area");
 const runBtn = document.querySelector("#run_btn");
 const restore_level = document.querySelector("#restore_level");
+const next_list = document.querySelector("#next_list");
 const next_level = document.querySelector("#next_level");
 const visual_area = document.querySelector(".visual_area");
 const code_area = document.querySelector('#code_area')
 const original_level_html = visual_area.innerHTML;
 const reset_code = document.querySelector("#reset_code");
-
-
+const previous_level = document.querySelector("#previous_level");
 
 
 document.addEventListener("DOMContentLoaded", (event) => {
@@ -75,7 +75,7 @@ restore_level.addEventListener("click", () => {
   visual_area.innerHTML = original_level_html;
 });
 
-next_level.addEventListener("click", () => {
+next_list.addEventListener("click", () => {
   localStorage.setItem('user_code', code_area.value)
   window.location.reload();
 });
@@ -98,3 +98,27 @@ runBtn.addEventListener("click", async () => {
   console.log(data);
   await show_result(data.result, data.expected_result);
 });
+
+next_level.addEventListener('click', async () =>{
+  localStorage.setItem("user_code", code_area.value);
+  const current = Number(level.level_number || new URLSearchParams(location.search).get("level") || 1);
+  const next = current + 1;
+
+  if (next > 3 || next < 1){
+    window.location.href = "/?level=" + 1;
+  }else{
+    window.location.href = "/?level=" + next;
+  }
+})
+
+previous_level.addEventListener('click', async () =>{
+  localStorage.setItem("user_code", code_area.value);
+  const current = Number(level.level_number || new URLSearchParams(location.search).get("level") || 1);
+  const prev = current - 1;
+
+  if (prev > 3 || prev < 1){
+    window.location.href = "/?level=" + 1;
+  }else{
+    window.location.href = "/?level=" + prev;
+  }
+})

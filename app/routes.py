@@ -18,17 +18,21 @@ aiohttp_jinja2.setup(
 app.router.add_static('/static/', path='static', name='static')
 
 
-#just for test not hardcode
-level_number = 1
 
 
 @aiohttp_jinja2.template('index.html')
 async def index(request):
-    
+    raw = request.rel_url.query.get("level", "1")
+    try:
+        level_number = int(raw)
+    except Exception as e:
+        logging.error(e)
+    if level_number < 1 or level_number > 3:
+        level_number = 1
     level_data = await get_level_data(level_number)
     generated_level = await generate_level(level_data)
     columns = div_generator(generated_level['items'])
-    return { 'columns' : columns,  'level': generated_level}
+    return { 'columns' : columns,  'level': generated_level,'level_number': level_number}
 
 
 async def run_code(request: web.Request) -> web.Response:
@@ -56,6 +60,7 @@ async def run_code(request: web.Request) -> web.Response:
     except Exception as e:
         logging.exception(e)
         return web.json_response({"ok": False, "error": "code error"}, status=400)
+    
 
 
 app.router.add_get('/', index)
