@@ -85,6 +85,15 @@ reset_code.addEventListener("click", () => {
   code_area.value = 'def sort(list):\n    return list'
 });
 
+async function show_error(error) {
+  visual_area.innerHTML = `
+  <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+    <h1 style="font-size: 300%; color: red; margin: 0;">ERROR</h1>
+    <h2 style="font-size: 200%; color: red; margin-top: 10px;">${error}</h2>
+  </div>
+`
+}
+
 runBtn.addEventListener("click", async () => {
   const res = await fetch("/api/run", {
     method: "POST",
@@ -95,8 +104,12 @@ runBtn.addEventListener("click", async () => {
     }),
   });
   const data = await res.json();
-  console.log(data);
-  await show_result(data.result, data.expected_result);
+  if (data.ok) {
+    console.log(data);
+    await show_result(data.result, data.expected_result);
+  }else{
+    await show_error(data.error)
+  }
 });
 
 next_level.addEventListener('click', async () =>{
